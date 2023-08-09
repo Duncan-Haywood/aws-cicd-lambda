@@ -4,36 +4,6 @@ orbs:
   terraform: circleci/terraform@3.2.1
 
 jobs:
-  validate:
-    docker: 
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - terraform/init
-      - run:
-          name: Terraform Validate
-          command: terraform validate
-  
-  plan:
-    docker:
-      - image: cimg/base:stable 
-    steps:
-      - checkout
-      - terraform/init
-      - run:
-          name: Terraform Plan
-          command: terraform plan -out=plan
-
-  apply:
-    docker:
-      - image: cimg/base:stable  
-    steps:
-      - checkout
-      - terraform/init
-      - run:
-          name: Terraform Apply
-          command: terraform apply -auto-approve
-
   test:
     docker:
       - image: cimg/python:3.9
@@ -45,38 +15,42 @@ jobs:
       - run:
           name: Run Tests
           command: pytest
-
-  destroy:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - terraform/init
-      - run:
-          name: Terraform Destroy
-          command: terraform destroy -auto-approve
-          
 workflows:
-  deploy:
+  deploy_infrastructure:
     jobs:
-      - validate
-      - plan:
+      - terraform/validate:
+          checkout: true
+          context: terraform
+      - terraform/plan:
+          checkout: true
+          context: terraform
+          persist-workspace: true
           requires:
-            - validate
+            - terraform/validate
       - hold:
           type: approval
           requires:
-            - plan
-      - apply:
+            - terraform/plan      
+      - terraform/apply:
+          attach-workspace: true
+          context: terraform
+          filters:
+            branches:
+              only: main
           requires:
             - hold
       - test:
           requires:
-            - apply
+            - terraform/apply
       - hold-2: 
           type: approval
           requires:
             - test
-      - destroy:
+      - terraform/destroy:
+          attach-workspace: true
+          context: terraform
+          filters:
+            branches:
+              only: main
           requires:
             - hold-2
