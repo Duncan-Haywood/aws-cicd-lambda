@@ -107,5 +107,5 @@ resource "aws_api_gateway_usage_plan" "nginx" {
 }
 
 output "api_url" {
-  value = "${aws_api_gateway_deployment.nginx.invoke_url}${aws_api_gateway_stage.test.stage_name}"
+  value = "${aws_api_gateway_deployment.nginx.invoke_url}${aws_api_gateway_stage.nginx.stage_name}"
 }
