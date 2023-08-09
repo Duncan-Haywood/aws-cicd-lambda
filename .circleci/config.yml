@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   terraform: circleci/terraform@3.2.1
+  aws-cli: circleci/aws-cli@4.0.0
 
 jobs:
   test:
@@ -18,6 +19,8 @@ jobs:
 workflows:
   deploy_infrastructure:
     jobs:
+      - aws-cli/setup:
+          context: aws
       - terraform/validate:
           checkout: true
           context: terraform
@@ -27,6 +30,7 @@ workflows:
           persist-workspace: true
           requires:
             - terraform/validate
+            - aws-cli/setup
       - hold:
           type: approval
           requires:
