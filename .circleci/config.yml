@@ -1,0 +1,67 @@
+version: 2.1
+
+orbs:
+  terraform: circleci/terraform@3.2.1
+
+jobs:
+  validate:
+    docker: 
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - terraform/init
+      - run:
+          name: Terraform Validate
+          command: terraform validate
+  
+  plan:
+    docker:
+      - image: cimg/base:stable 
+    steps:
+      - checkout
+      - terraform/init
+      - run:
+          name: Terraform Plan
+          command: terraform plan -out=plan
+
+  apply:
+    docker:
+      - image: cimg/base:stable  
+    steps:
+      - checkout
+      - terraform/init
+      - run:
+          name: Terraform Apply
+          command: terraform apply -auto-approve
+
+  destroy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - terraform/init
+      - run:
+          name: Terraform Destroy
+          command: terraform destroy -auto-approve
+          
+workflows:
+  deploy:
+    jobs:
+      - validate
+      - plan:
+          requires:
+            - validate
+      - hold:
+          type: approval
+          requires:
+            - plan
+      - apply:
+          requires:
+            - hold
+      - hold-2: 
+          type: approval
+          requires:
+            - apply
+      - destroy:
+          requires:
+            - hold-2
