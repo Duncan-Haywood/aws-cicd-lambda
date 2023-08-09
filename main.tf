@@ -2,7 +2,7 @@
 
 # Configure the AWS provider
 provider "aws" {
-  region = "us-east-1" 
+  region = "us-east-1"
 }
 
 # Create a Docker image 
@@ -60,7 +60,7 @@ resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = aws_api_gateway_rest_api.nginx.id
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "ANY"
-  authorization = "NONE" 
+  authorization = "NONE"
 }
 
 # Integrate method with Lambda
