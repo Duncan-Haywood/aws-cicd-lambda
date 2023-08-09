@@ -8,13 +8,24 @@ terraform {
   }
 }
 
+# Set credentials as variables
+variable "aws_access_key" {
+  type = string 
+}
+
+variable "aws_secret_key" {
+  type = string
+}
+
+
 provider "docker" {
   host = "unix:///var/run/docker.sock"
 }
 
 # Configure the AWS provider
 provider "aws" {
-  region = "us-east-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 # Create a Docker image 
