@@ -3,11 +3,12 @@
 import requests
 import pytest
 import time
+import os
 
-API_URL = "https://xyz123.execute-api.us-east-1.amazonaws.com/test"
 
 @pytest.mark.nginx
 def test_nginx_response():
+    API_URL = os.getenv("API_URL")
     while True:
         try:
             response = requests.get(API_URL)
