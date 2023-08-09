@@ -34,6 +34,18 @@ jobs:
           name: Terraform Apply
           command: terraform apply -auto-approve
 
+  test:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - run: 
+          name: Install Dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: Run Tests
+          command: pytest
+
   destroy:
     docker:
       - image: cimg/base:stable
@@ -58,10 +70,13 @@ workflows:
       - apply:
           requires:
             - hold
+      - test:
+          requires:
+            - apply
       - hold-2: 
           type: approval
           requires:
-            - apply
+            - test
       - destroy:
           requires:
             - hold-2
